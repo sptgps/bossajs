@@ -1,0 +1,19 @@
+{
+  "name": "node-nan-experiment",
+  "version": "1.0.0",
+  "main": "bindings.js",
+  "author": "Danielle Madeley <danielle@madeley.id.au>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "node-gyp build",
+    "install": "node-gyp rebuild",
+    "test": "mocha tests/**/*.spec.js"
+  },
+  "dependencies": {
+    "nan": "^2.12.1"
+  },
+  "devDependencies": {
+    "mocha": "^5.2.0"
+  }
+}
