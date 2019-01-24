@@ -6,7 +6,8 @@
       "<!(node -e \"require('nan')\")"
     ],
     "sources": [
-      "src/index.cc"
+      "src/index.cc",
+      "src/bossajs.cc"
     ]
   }]
 }

@@ -1,9 +1,9 @@
-var module;
+var bossa;
 
 if (process.env.DEBUG) {
-    module = require('./build/Debug/bossa.node');
+    bossa = require('./build/Debug/bossa.node');
 } else {
-    module = require('./build/Release/bossa.node')
+    bossa = require('./build/Release/bossa.node');
 }
 
-module.exports = module;
+module.exports = bossa;
