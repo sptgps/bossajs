@@ -18,5 +18,18 @@ describe("Bossa", () => {
         expect(() => {
             new Bossa(1);
         }).to.throw(TypeError);
+
+        expect(new Bossa({
+            
+            port: process.env.PORT,
+        })).to.be.a('Bossa');
+    });
+
+    it("info", () => {
+        const bossa = new Bossa({
+            port: process.env.PORT,
+            debug: true,
+            info: true,
+        });
     });
 });
