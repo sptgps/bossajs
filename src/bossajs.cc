@@ -2,24 +2,13 @@
 #include <string>
 
 #include "bossajs.h"
+#include "infoworker.h"
 #include "util.h"
 
 using namespace v8;
 
 
 Nan::Persistent<FunctionTemplate> Bossa::constructor;
-
-
-void BossaObserver::onStatus(const char* message, ...) {
-    va_list ap;
-    
-    va_start(ap, message);
-    vprintf(message, ap);
-    va_end(ap);
-}
-
-void BossaObserver::onProgress(int num, int div) {
-}
 
 
 Bossa::Bossa(std::string port, bool debug) {
@@ -103,40 +92,13 @@ NAN_METHOD(Bossa::New) {
 
 NAN_METHOD(Bossa::Info) {
     Bossa* self = Nan::ObjectWrap::Unwrap<Bossa>(info.This());
-    Local<Object> obj = Nan::New<Object>();
-    FlasherInfo finfo;
 
-    self->flasher->info(finfo);
-
-    obj->Set(L("name"), L(finfo.name));
-    obj->Set(L("chipId"), Nan::New(finfo.chipId));
-    obj->Set(L("extChipId"), Nan::New(finfo.extChipId));
-    obj->Set(L("version"), L(finfo.version));
-    obj->Set(L("address"), Nan::New(finfo.address));
-    obj->Set(L("numPages"), Nan::New(finfo.numPages));
-    obj->Set(L("pageSize"), Nan::New(finfo.pageSize));
-    obj->Set(L("totalSize"), Nan::New(finfo.totalSize));
-    obj->Set(L("numPlanes"), Nan::New(finfo.numPlanes));
-
-    obj->Set(L("security"), Nan::New(finfo.security));
-    obj->Set(L("bootFlash"), Nan::New(finfo.bootFlash));
-    obj->Set(L("bod"), Nan::New(finfo.bod));
-    obj->Set(L("bor"), Nan::New(finfo.bor));
-
-    obj->Set(L("canBootFlash"), Nan::New(finfo.canBootFlash));
-    obj->Set(L("canBod"), Nan::New(finfo.canBod));
-    obj->Set(L("canBor"), Nan::New(finfo.canBor));
-    obj->Set(L("canChipErase"), Nan::New(finfo.canChipErase));
-    obj->Set(L("canWriteBuffer"), Nan::New(finfo.canWriteBuffer));
-    obj->Set(L("canChecksumBuffer"), Nan::New(finfo.canChecksumBuffer));
-
-    Local<Array> lockRegions = Nan::New<Array>(finfo.lockRegions.size());
-    unsigned index = 0;
-    for (auto elem : finfo.lockRegions) {
-        Nan::Set(lockRegions, index, Nan::New(elem));
-        index++;
+    if (info.Length() != 1 || !info[0]->IsFunction()) {
+        return Nan::ThrowTypeError(L("callback must be a function"));
     }
-    obj->Set(L("lockRegions"), lockRegions);
 
-    info.GetReturnValue().Set(obj);
+    Nan::Callback* callback =
+        new Nan::Callback(Nan::To<Function>(info[0]).ToLocalChecked());
+    Nan::AsyncQueueWorker(new InfoWorker(callback, self));
+
 }

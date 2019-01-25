@@ -24,13 +24,41 @@ describe("Bossa", () => {
         })).to.be.a('Bossa');
     });
 
-    it("info", () => {
+    it("info", done => {
         const bossa = new Bossa({
             port: process.env.PORT,
             debug: true,
         });
-        const info = bossa.info();
-        expect(info).to.be.an('object');
-        console.log(info);
+        const info = bossa.info((err, info) => {
+            expect(err).to.be.null;
+            expect(info).to.be.an('object');
+            expect(info).to.have.keys(
+                "name",
+                "chipId",
+                "extChipId",
+                "version",
+                "address",
+                "numPages",
+                "pageSize",
+                "totalSize",
+                "numPlanes",
+
+                "security",
+                "bootFlash",
+                "bod",
+                "bor",
+
+                "canBootFlash",
+                "canBod",
+                "canBor",
+                "canChipErase",
+                "canWriteBuffer",
+                "canChecksumBuffer",
+
+                "lockRegions",
+            );
+
+            done();
+        });
     });
 });

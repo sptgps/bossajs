@@ -14,6 +14,8 @@
     "sources": [
       "src/index.cc",
       "src/bossajs.cc",
+      "src/observer.cc",
+      "src/infoworker.cc",
       "extern/bossa/src/WordCopyArm.cpp",
       "extern/bossa/src/Samba.cpp",
       "extern/bossa/src/Flash.cpp",

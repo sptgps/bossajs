@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <optional>
 
@@ -8,17 +10,7 @@
 #include "PortFactory.h"
 #include "Device.h"
 
-
-class BossaObserver : public FlasherObserver {
-    private:
-
-    public:
-        BossaObserver() {}
-        virtual ~BossaObserver() {}
-        
-        virtual void onStatus(const char *message, ...);
-        virtual void onProgress(int num, int div);
-};
+#include "observer.h"
 
 
 class Bossa : public Nan::ObjectWrap {
@@ -26,11 +18,12 @@ class Bossa : public Nan::ObjectWrap {
         Samba samba;
         PortFactory portFactory;
         std::optional<Device> device;
-        std::optional<Flasher> flasher;
 
         BossaObserver observer;
 
     public:
+        std::optional<Flasher> flasher;
+
         Bossa(std::string port, bool debug);
 
         static NAN_MODULE_INIT(Init);
