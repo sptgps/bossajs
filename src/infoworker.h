@@ -14,12 +14,13 @@ class InfoWorker : public Nan::AsyncWorker {
 
     public:
         InfoWorker(Nan::Callback* callback,
-                   Bossa* bossa) :
-                   Nan::AsyncWorker(callback),
+                   Bossa* bossa)
+                 : Nan::AsyncWorker(callback),
                    bossa(bossa)
                    {}
         ~InfoWorker() {}
 
         void Execute();
         void HandleOKCallback();
+        void HandleErrorCallback();
 };

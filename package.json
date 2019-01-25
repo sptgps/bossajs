@@ -9,12 +9,15 @@
     "build": "node-gyp build",
     "rebuild": "node-gyp rebuild",
     "install": "node-gyp rebuild",
-    "test": "mocha tests/**/*.spec.js"
+    "test": "mocha --require @babel/register --require @babel/polyfill tests/**/*.spec.js"
   },
   "dependencies": {
     "nan": "^2.12.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/polyfill": "^7.2.5",
+    "@babel/register": "^7.0.0",
     "chai": "^4.2.0",
     "mocha": "^5.2.0"
   }

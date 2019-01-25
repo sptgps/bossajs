@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "infoworker.h"
 #include "util.h"
 
@@ -7,7 +5,11 @@ using namespace v8;
 
 
 void InfoWorker::Execute() {
-    bossa->flasher->info(finfo);
+    try {
+        bossa->info(finfo);
+    } catch(const std::exception& exc) {
+        SetErrorMessage(exc.what());
+    }
 }
 
 
@@ -46,8 +48,20 @@ void InfoWorker::HandleOKCallback() {
     obj->Set(L("lockRegions"), lockRegions);
 
     Local<Value> argv[] = {
+        Nan::Null(),  // err
+        obj,  // value
+    };
+
+    callback->Call(2, argv, async_resource);
+}
+
+
+void InfoWorker::HandleErrorCallback() {
+    Nan::HandleScope scope;
+
+    Local<Value> argv[] = {
+        Nan::Error(this->ErrorMessage()),  // err
         Nan::Null(),
-        obj,
     };
 
     callback->Call(2, argv, async_resource);

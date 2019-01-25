@@ -1,4 +1,6 @@
-const { expect } = require('chai');
+const { promisify } = require('util');
+
+const { assert, expect } = require('chai');
 
 
 describe("Bossa", () => {
@@ -10,55 +12,62 @@ describe("Bossa", () => {
         }).to.throw(Error, "Must call with new keyword");
     });
 
-    it("requires an object", () => {
-        expect(() => {
-            new Bossa();
-        }).to.throw(TypeError);
-
+    it("require an object or nothing", () => {
         expect(() => {
             new Bossa(1);
         }).to.throw(TypeError);
 
-        expect(new Bossa({
-            port: process.env.PORT,
-        })).to.be.a('Bossa');
+        expect(new Bossa()).to.be.a('Bossa');
+        expect(new Bossa({})).to.be.a('Bossa');
     });
 
-    it("info", done => {
-        const bossa = new Bossa({
-            port: process.env.PORT,
-            debug: true,
-        });
-        const info = bossa.info((err, info) => {
-            expect(err).to.be.null;
-            expect(info).to.be.an('object');
-            expect(info).to.have.keys(
-                "name",
-                "chipId",
-                "extChipId",
-                "version",
-                "address",
-                "numPages",
-                "pageSize",
-                "totalSize",
-                "numPlanes",
+    it("connect", done => {
+        const bossa = new Bossa();
+        bossa.connect(process.env.PORT, done);
+    });
 
-                "security",
-                "bootFlash",
-                "bod",
-                "bor",
+    it("must be connected", async () => {
+        const bossa = new Bossa();
+    
+        try {
+            await promisify(bossa.info.bind(bossa))();
+            assert.fail("Not reached");
+        } catch (e) {
+            expect(e).is.a('Error');
+        }
+    });
 
-                "canBootFlash",
-                "canBod",
-                "canBor",
-                "canChipErase",
-                "canWriteBuffer",
-                "canChecksumBuffer",
+    it("info", async () => {
+        const bossa = new Bossa();
 
-                "lockRegions",
-            );
+        await promisify(bossa.connect.bind(bossa))(process.env.PORT);
+        const info = await promisify(bossa.info.bind(bossa))();
 
-            done();
-        });
+        expect(info).to.be.an('object');
+        expect(info).to.have.keys(
+            "name",
+            "chipId",
+            "extChipId",
+            "version",
+            "address",
+            "numPages",
+            "pageSize",
+            "totalSize",
+            "numPlanes",
+
+            "security",
+            "bootFlash",
+            "bod",
+            "bor",
+
+            "canBootFlash",
+            "canBod",
+            "canBor",
+            "canChipErase",
+            "canWriteBuffer",
+            "canChecksumBuffer",
+
+            "lockRegions",
+        );
     });
 });

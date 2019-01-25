@@ -15,6 +15,7 @@
       "src/index.cc",
       "src/bossajs.cc",
       "src/observer.cc",
+      "src/connectworker.cc",
       "src/infoworker.cc",
       "extern/bossa/src/WordCopyArm.cpp",
       "extern/bossa/src/Samba.cpp",
