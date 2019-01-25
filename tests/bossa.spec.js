@@ -20,7 +20,6 @@ describe("Bossa", () => {
         }).to.throw(TypeError);
 
         expect(new Bossa({
-            
             port: process.env.PORT,
         })).to.be.a('Bossa');
     });
@@ -29,7 +28,9 @@ describe("Bossa", () => {
         const bossa = new Bossa({
             port: process.env.PORT,
             debug: true,
-            info: true,
         });
+        const info = bossa.info();
+        expect(info).to.be.an('object');
+        console.log(info);
     });
 });

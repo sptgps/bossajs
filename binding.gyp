@@ -6,6 +6,7 @@
       "extern/bossa/src",
       "<!(node -e \"require('nan')\")"
     ],
+    "cflags_cc": [ "-std=c++17" ],
     "cflags_cc!": [ "-fno-exceptions" ],
     "defines": [
       "VERSION=FIXME"
@@ -32,7 +33,8 @@
           "extern/bossa/src/OSXPortFactory.cpp"
         ],
         "xcode_settings": {
-          "GCC_ENABLE_CPP_EXCEPTIONS": "YES"
+          "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
+          "OTHER_CFLAGS": [ "-std=c++17" ]
         }
       }]
     ]
