@@ -1,8 +1,11 @@
-#include <string>
+#include <cstdio>
+#include <fstream>
+#include <iterator>
 
 #include "bossajs.h"
 #include "connectworker.h"
 #include "infoworker.h"
+#include "readworker.h"
 #include "util.h"
 
 using namespace v8;
@@ -11,7 +14,8 @@ using namespace v8;
 Nan::Persistent<FunctionTemplate> Bossa::constructor;
 
 
-void Bossa::info(FlasherInfo& finfo) {
+void
+Bossa::info(FlasherInfo& finfo) {
     if (!connected) {
         throw NotConnected();
     }
@@ -20,7 +24,8 @@ void Bossa::info(FlasherInfo& finfo) {
 }
 
 
-void Bossa::connect(std::string port) {
+void
+Bossa::connect(std::string port) {
     if (port.empty()) {
         port = portFactory.def();
     }
@@ -42,6 +47,37 @@ void Bossa::connect(std::string port) {
 }
 
 
+std::string  // FIXME: potentially very big
+Bossa::read(uint32_t offset, uint32_t size) {
+    // FIXME: deprecated
+    const char* filename = std::tmpnam(nullptr);
+
+    try {
+        flasher->read(filename, size, offset);
+
+    } catch (...) {
+        std::remove(filename);
+        throw;
+    }
+
+    // Reopen the file to copy its contents out
+    std::ifstream file(filename, std::ios::binary);
+
+    try {
+        std::string content((std::istreambuf_iterator<char>(file)),
+                            std::istreambuf_iterator<char>());
+
+        file.close();
+        std::remove(filename);
+
+        return content;
+    } catch (...) {
+        file.close();
+        std::remove(filename);
+    }
+}
+
+
 NAN_MODULE_INIT(Bossa::Init) {
     Local<FunctionTemplate> ctor = Nan::New<FunctionTemplate>(New);
 
@@ -55,6 +91,7 @@ NAN_MODULE_INIT(Bossa::Init) {
     // Set Methods into Prototype
     Nan::SetPrototypeMethod(ctor, "connect", Connect);
     Nan::SetPrototypeMethod(ctor, "info", Info);
+    Nan::SetPrototypeMethod(ctor, "read", Read);
 
     // Export class
     target->Set(L("Bossa"), ctor->GetFunction());
@@ -66,21 +103,21 @@ NAN_METHOD(Bossa::New) {
     bool debug = false;
 
     if (!info.IsConstructCall()) {
-        return Nan::ThrowError(L("Must call with new keyword"));
+        return Nan::ThrowError("Must call with new keyword");
     }
 
     if (info.Length() == 0) {
         // Pass
     } else if (info.Length() == 1) {
         if (!info[0]->IsObject()) {
-            return Nan::ThrowTypeError(L("opts must be an object"));
+            return Nan::ThrowTypeError("opts must be an object");
         } else {
             // Load config
             Local config = Nan::To<Object>(info[0]).ToLocalChecked();
-            debug = AS_BOOL(OBJ_GET(config, "debug"));
+            debug = Nan::To<bool>(OBJ_GET(config, "debug")).FromMaybe(false);
         }
     } else {
-        return Nan::ThrowTypeError(L("opts must be an object or nothing"));
+        return Nan::ThrowTypeError("opts must be an object or nothing");
     }
 
     try {
@@ -102,15 +139,15 @@ NAN_METHOD(Bossa::Connect) {
     std::string port;
 
     if (info.Length() != 2) {
-        return Nan::ThrowTypeError(L("Must provide port and callback"));
+        return Nan::ThrowTypeError("Must provide port and callback");
     }
     
     if (!info[0]->IsString()) {
-        return Nan::ThrowTypeError(L("port must be a string"));
+        return Nan::ThrowTypeError("port must be a string");
     }
 
     if (!info[1]->IsFunction()) {
-        return Nan::ThrowTypeError(L("callback must be a function"));
+        return Nan::ThrowTypeError("callback must be a function");
     }
 
     Local value = Nan::To<String>(info[0]).ToLocalChecked();
@@ -131,10 +168,37 @@ NAN_METHOD(Bossa::Info) {
     Bossa* self = Nan::ObjectWrap::Unwrap<Bossa>(info.This());
 
     if (info.Length() != 1 || !info[0]->IsFunction()) {
-        return Nan::ThrowTypeError(L("callback must be a function"));
+        return Nan::ThrowTypeError("callback must be a function");
     }
 
     Nan::Callback* callback =
         new Nan::Callback(Nan::To<Function>(info[0]).ToLocalChecked());
     Nan::AsyncQueueWorker(new InfoWorker(callback, self));
+}
+
+
+NAN_METHOD(Bossa::Read) {
+    Bossa* self = Nan::ObjectWrap::Unwrap<Bossa>(info.This());
+
+    if (info.Length() != 3) {
+        return Nan::ThrowTypeError("must provide offset, size and callback");
+    }
+
+    if (!info[0]->IsUint32()) {
+        return Nan::ThrowTypeError("offset must be an integer");
+    }
+    uint32_t offset = Nan::To<uint32_t>(info[0]).FromJust();
+
+    if (!info[1]->IsUint32()) {
+        return Nan::ThrowTypeError("size must be an integer");
+    }
+    uint32_t size = Nan::To<uint32_t>(info[1]).FromJust();
+
+    if (!info[2]->IsFunction()) {
+        return Nan::ThrowTypeError("callback must be a function");
+    }
+
+    Nan::Callback* callback =
+        new Nan::Callback(Nan::To<Function>(info[2]).ToLocalChecked());
+    Nan::AsyncQueueWorker(new ReadWorker(callback, self, offset, size));
 }

@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <optional>
+#include <string>
 
 #include <nan.h>
 
@@ -37,12 +38,14 @@ class Bossa : public Nan::ObjectWrap {
 
         void connect(std::string port);
         void info(FlasherInfo& info);
+        std::string read(uint32_t offset, uint32_t size);
 
         static NAN_MODULE_INIT(Init);
 
         static NAN_METHOD(New);
         static NAN_METHOD(Connect);
         static NAN_METHOD(Info);
+        static NAN_METHOD(Read);
 
         static Nan::Persistent<v8::FunctionTemplate> constructor;
 };

@@ -70,4 +70,13 @@ describe("Bossa", () => {
             "lockRegions",
         );
     });
+
+    it("read", async () => {
+        const bossa = new Bossa();
+        await promisify(bossa.connect.bind(bossa))(process.env.PORT);
+
+        const data = await promisify(bossa.read.bind(bossa))(0x0, 512);
+        expect(data).to.be.an.instanceOf(Buffer);
+        expect(data).to.have.length(512);
+    });
 });

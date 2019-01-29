@@ -17,6 +17,7 @@
       "src/observer.cc",
       "src/connectworker.cc",
       "src/infoworker.cc",
+      "src/readworker.cc",
       "extern/bossa/src/WordCopyArm.cpp",
       "extern/bossa/src/Samba.cpp",
       "extern/bossa/src/Flash.cpp",
