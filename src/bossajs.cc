@@ -4,6 +4,7 @@
 
 #include "bossajs.h"
 #include "connectworker.h"
+#include "eraseworker.h"
 #include "infoworker.h"
 #include "readworker.h"
 #include "util.h"
@@ -12,16 +13,6 @@ using namespace v8;
 
 
 Nan::Persistent<FunctionTemplate> Bossa::constructor;
-
-
-void
-Bossa::info(FlasherInfo& finfo) {
-    if (!connected) {
-        throw NotConnected();
-    }
-
-    flasher->info(finfo);
-}
 
 
 void
@@ -44,6 +35,22 @@ Bossa::connect(std::string port) {
     flasher.emplace(samba, *device, observer);
 
     connected = true;
+}
+
+
+void
+Bossa::erase(uint32_t offset) {
+    flasher->erase(offset);
+}
+
+
+void
+Bossa::info(FlasherInfo& finfo) {
+    if (!connected) {
+        throw NotConnected();
+    }
+
+    flasher->info(finfo);
 }
 
 
@@ -90,6 +97,7 @@ NAN_MODULE_INIT(Bossa::Init) {
 
     // Set Methods into Prototype
     Nan::SetPrototypeMethod(ctor, "connect", Connect);
+    Nan::SetPrototypeMethod(ctor, "erase", Erase);
     Nan::SetPrototypeMethod(ctor, "info", Info);
     Nan::SetPrototypeMethod(ctor, "read", Read);
 
@@ -121,15 +129,12 @@ NAN_METHOD(Bossa::New) {
     }
 
     try {
-
         Bossa* self = new Bossa(debug);
-
-        // // Device::FlashPtr& flash = bossa->device.getFlash();
 
         self->Wrap(info.Holder());
         info.GetReturnValue().Set(info.Holder());
     } catch(const std::exception& exc) {
-        return Nan::ThrowError(L(exc.what()));
+        return Nan::ThrowError(exc.what());
     }
 }
 
@@ -145,11 +150,6 @@ NAN_METHOD(Bossa::Connect) {
     if (!info[0]->IsString()) {
         return Nan::ThrowTypeError("port must be a string");
     }
-
-    if (!info[1]->IsFunction()) {
-        return Nan::ThrowTypeError("callback must be a function");
-    }
-
     Local value = Nan::To<String>(info[0]).ToLocalChecked();
 
     if (!value->IsNullOrUndefined()) {
@@ -157,6 +157,9 @@ NAN_METHOD(Bossa::Connect) {
         port = std::string(*port_);
     }
 
+    if (!info[1]->IsFunction()) {
+        return Nan::ThrowTypeError("callback must be a function");
+    }
     Nan::Callback* callback =
         new Nan::Callback(Nan::To<Function>(info[1]).ToLocalChecked());
 
@@ -173,6 +176,7 @@ NAN_METHOD(Bossa::Info) {
 
     Nan::Callback* callback =
         new Nan::Callback(Nan::To<Function>(info[0]).ToLocalChecked());
+
     Nan::AsyncQueueWorker(new InfoWorker(callback, self));
 }
 
@@ -197,8 +201,30 @@ NAN_METHOD(Bossa::Read) {
     if (!info[2]->IsFunction()) {
         return Nan::ThrowTypeError("callback must be a function");
     }
-
     Nan::Callback* callback =
         new Nan::Callback(Nan::To<Function>(info[2]).ToLocalChecked());
+
     Nan::AsyncQueueWorker(new ReadWorker(callback, self, offset, size));
+}
+
+
+NAN_METHOD(Bossa::Erase) {
+    Bossa* self = Nan::ObjectWrap::Unwrap<Bossa>(info.This());
+
+    if (info.Length() != 2) {
+        return Nan::ThrowTypeError("must provide offset and callback");
+    }
+
+    if (!info[0]->IsUint32()) {
+        return Nan::ThrowTypeError("offset must be an integer");
+    }
+    uint32_t offset = Nan::To<uint32_t>(info[0]).FromJust();
+
+    if (!info[1]->IsFunction()) {
+        return Nan::ThrowTypeError("callback must be a function");
+    }
+    Nan::Callback* callback =
+        new Nan::Callback(Nan::To<Function>(info[1]).ToLocalChecked());
+
+    Nan::AsyncQueueWorker(new EraseWorker(callback, self, offset));
 }

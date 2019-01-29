@@ -31,21 +31,24 @@ class Bossa : public Nan::ObjectWrap {
 
         bool connected = false;
     public:
-
         Bossa(bool debug) {
             samba.setDebug(debug);
         };
 
+        // C++ Methods
         void connect(std::string port);
         void info(FlasherInfo& info);
         std::string read(uint32_t offset, uint32_t size);
+        void erase(uint32_t offset);
 
         static NAN_MODULE_INIT(Init);
 
+        // Node methods
         static NAN_METHOD(New);
         static NAN_METHOD(Connect);
         static NAN_METHOD(Info);
         static NAN_METHOD(Read);
+        static NAN_METHOD(Erase);
 
         static Nan::Persistent<v8::FunctionTemplate> constructor;
 };

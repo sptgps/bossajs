@@ -79,4 +79,13 @@ describe("Bossa", () => {
         expect(data).to.be.an.instanceOf(Buffer);
         expect(data).to.have.length(512);
     });
+
+    it("erase", async function () {
+        this.timeout(20000);
+
+        const bossa = new Bossa();
+        await promisify(bossa.connect.bind(bossa))(process.env.PORT);
+
+        await promisify(bossa.erase.bind(bossa))(0x2000);
+    });
 });

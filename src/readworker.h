@@ -10,7 +10,6 @@ using namespace v8;
 class ReadWorker : public Nan::AsyncWorker {
     private:
         Bossa* bossa;
-        FlasherInfo finfo;
 
         uint32_t offset;
         uint32_t size;

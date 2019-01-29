@@ -16,6 +16,7 @@
       "src/bossajs.cc",
       "src/observer.cc",
       "src/connectworker.cc",
+      "src/eraseworker.cc",
       "src/infoworker.cc",
       "src/readworker.cc",
       "extern/bossa/src/WordCopyArm.cpp",
