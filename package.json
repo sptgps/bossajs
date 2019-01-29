@@ -1,13 +1,14 @@
 {
-  "name": "node-nan-experiment",
-  "version": "1.0.0",
+  "name": "bossajs",
+  "version": "0.1.0",
   "main": "bindings.js",
-  "author": "Danielle Madeley <danielle@madeley.id.au>",
+  "author": "Sports Performance Tracking <engineering@sportsperformancetracking.com>",
   "license": "MIT",
   "private": true,
   "scripts": {
     "build": "node-gyp build",
     "rebuild": "node-gyp rebuild",
+    "preinstall": "sed -n -e '/path/,/url/p' .gitmodules | sed 'N;s/\\n/\\$$$/' | while IFS= read -r line; do if [[ $line =~ (.*)\\$\\$\\$(.*) ]] ; then path=\"$(echo ${BASH_REMATCH[1]} | sed 's/.*= //')\"; url=\"$(echo ${BASH_REMATCH[2]} | sed 's/.*= //')\"; if [ -d $path ] ; then start=$PWD; cd $path; git pull; cd $PWD; else git clone $url $path; fi fi done",
     "install": "node-gyp rebuild",
     "test": "mocha --require @babel/register --require @babel/polyfill tests/**/*.spec.js"
   },
