@@ -7,6 +7,7 @@
 #include "eraseworker.h"
 #include "infoworker.h"
 #include "readworker.h"
+#include "writeworker.h"
 #include "util.h"
 
 using namespace v8;
@@ -64,6 +65,7 @@ Bossa::read(uint32_t offset, uint32_t size) {
 
     } catch (...) {
         std::remove(filename);
+
         throw;
     }
 
@@ -81,6 +83,39 @@ Bossa::read(uint32_t offset, uint32_t size) {
     } catch (...) {
         file.close();
         std::remove(filename);
+
+        throw;
+    }
+
+    assert("Not reached");
+}
+
+
+void
+Bossa::write(std::string content, uint32_t offset) {
+    // FIXME: deprecated
+    const char* filename = std::tmpnam(nullptr);
+
+    // Write the buffer to disk
+    std::ofstream file(filename, std::ios::binary);
+
+    try {
+        file.write(content.c_str(), content.length());
+        file.close();
+    } catch (...) {
+        file.close();
+        std::remove(filename);
+
+        throw;
+    }
+
+    try {
+        flasher->write(filename, offset);
+        std::remove(filename);
+    } catch (...) {
+        std::remove(filename);
+
+        throw;
     }
 }
 
@@ -100,6 +135,7 @@ NAN_MODULE_INIT(Bossa::Init) {
     Nan::SetPrototypeMethod(ctor, "erase", Erase);
     Nan::SetPrototypeMethod(ctor, "info", Info);
     Nan::SetPrototypeMethod(ctor, "read", Read);
+    Nan::SetPrototypeMethod(ctor, "write", Write);
 
     // Export class
     target->Set(L("Bossa"), ctor->GetFunction());
@@ -227,4 +263,32 @@ NAN_METHOD(Bossa::Erase) {
         new Nan::Callback(Nan::To<Function>(info[1]).ToLocalChecked());
 
     Nan::AsyncQueueWorker(new EraseWorker(callback, self, offset));
+}
+
+
+NAN_METHOD(Bossa::Write) {
+    Bossa* self = Nan::ObjectWrap::Unwrap<Bossa>(info.This());
+
+    if (info.Length() != 3) {
+        return Nan::ThrowTypeError("must provide buffer, offset and callback");
+    }
+
+    if (!info[0]->IsObject()) {
+        return Nan::ThrowTypeError("data must be a Buffer");
+    }
+    // This memory is owned by the buffer
+    const char* buffer = node::Buffer::Data(Nan::To<Object>(info[0]).ToLocalChecked());
+    
+    if (!info[1]->IsUint32()) {
+        return Nan::ThrowTypeError("offset must be an integer");
+    }
+    uint32_t offset = Nan::To<uint32_t>(info[1]).FromJust();
+
+    if (!info[2]->IsFunction()) {
+        return Nan::ThrowTypeError("callback must be a function");
+    }
+    Nan::Callback* callback =
+        new Nan::Callback(Nan::To<Function>(info[2]).ToLocalChecked());
+
+    Nan::AsyncQueueWorker(new WriteWorker(callback, self, buffer, offset));
 }

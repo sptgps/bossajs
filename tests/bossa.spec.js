@@ -3,6 +3,11 @@ const { promisify } = require('util');
 const { assert, expect } = require('chai');
 
 
+function toPromise(obj, method, ...args) {
+    return promisify(obj[method].bind(obj))(...args);
+}
+
+
 describe("Bossa", () => {
     const Bossa = require('../').default;
 
@@ -30,7 +35,7 @@ describe("Bossa", () => {
         const bossa = new Bossa();
     
         try {
-            await promisify(bossa.info.bind(bossa))();
+            await toPromise(bossa, 'info');
             assert.fail("Not reached");
         } catch (e) {
             expect(e).is.a('Error');
@@ -40,8 +45,8 @@ describe("Bossa", () => {
     it("info", async () => {
         const bossa = new Bossa();
 
-        await promisify(bossa.connect.bind(bossa))(process.env.PORT);
-        const info = await promisify(bossa.info.bind(bossa))();
+        await toPromise(bossa, 'connect', process.env.PORT);
+        const info = await toPromise(bossa, 'info');
 
         expect(info).to.be.an('object');
         expect(info).to.have.keys(
@@ -71,21 +76,32 @@ describe("Bossa", () => {
         );
     });
 
-    it("read", async () => {
+    it("read first 512 bytes", async () => {
         const bossa = new Bossa();
-        await promisify(bossa.connect.bind(bossa))(process.env.PORT);
+        await toPromise(bossa, 'connect', process.env.PORT);
 
-        const data = await promisify(bossa.read.bind(bossa))(0x0, 512);
+        const data = await toPromise(bossa, 'read', 0x0, 512);
         expect(data).to.be.an.instanceOf(Buffer);
         expect(data).to.have.length(512);
     });
 
     it("erase", async function () {
+        this.skip("Slow");
         this.timeout(20000);
 
         const bossa = new Bossa();
-        await promisify(bossa.connect.bind(bossa))(process.env.PORT);
+        await toPromise(bossa, 'connect', process.env.PORT);
+        await toPromise(bossa, 'erase', 0x2000);
+    });
 
-        await promisify(bossa.erase.bind(bossa))(0x2000);
+    it("write and read", async () => {
+        const bossa = new Bossa();
+        const buffer = Buffer.from([0xd, 0xe, 0xa, 0xd, 0xb, 0xe, 0xe, 0xf]);
+
+        await toPromise(bossa, 'connect', process.env.PORT);
+        await toPromise(bossa, 'write', buffer, 0x3000);
+
+        const result = await toPromise(bossa, 'read', 0x3000, buffer.length);
+        expect(result).to.deep.equal(buffer);
     });
 });

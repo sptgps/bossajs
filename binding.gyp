@@ -19,6 +19,7 @@
       "src/eraseworker.cc",
       "src/infoworker.cc",
       "src/readworker.cc",
+      "src/writeworker.cc",
       "extern/bossa/src/WordCopyArm.cpp",
       "extern/bossa/src/Samba.cpp",
       "extern/bossa/src/Flash.cpp",
