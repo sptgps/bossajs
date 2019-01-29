@@ -19,18 +19,19 @@
       "src/eraseworker.cc",
       "src/infoworker.cc",
       "src/readworker.cc",
+      "src/verifyworker.cc",
       "src/writeworker.cc",
-      "extern/bossa/src/WordCopyArm.cpp",
-      "extern/bossa/src/Samba.cpp",
-      "extern/bossa/src/Flash.cpp",
-      "extern/bossa/src/D5xNvmFlash.cpp",
-      "extern/bossa/src/D2xNvmFlash.cpp",
-      "extern/bossa/src/EfcFlash.cpp",
-      "extern/bossa/src/EefcFlash.cpp",
       "extern/bossa/src/Applet.cpp",
-      "extern/bossa/src/WordCopyApplet.cpp",
+      "extern/bossa/src/D2xNvmFlash.cpp",
+      "extern/bossa/src/D5xNvmFlash.cpp",
+      "extern/bossa/src/Device.cpp",
+      "extern/bossa/src/EefcFlash.cpp",
+      "extern/bossa/src/EfcFlash.cpp",
+      "extern/bossa/src/Flash.cpp",
       "extern/bossa/src/Flasher.cpp",
-      "extern/bossa/src/Device.cpp"
+      "extern/bossa/src/Samba.cpp",
+      "extern/bossa/src/WordCopyApplet.cpp",
+      "extern/bossa/src/WordCopyArm.cpp"
     ],
     "conditions": [
       ['OS=="mac"', {

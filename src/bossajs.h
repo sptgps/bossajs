@@ -40,6 +40,7 @@ class Bossa : public Nan::ObjectWrap {
         void info(FlasherInfo& info);
         std::string read(uint32_t offset, uint32_t size);
         void erase(uint32_t offset);
+        bool verify(std::string content, u_int32_t offset);
         void write(std::string content, uint32_t offset);
 
         static NAN_MODULE_INIT(Init);
@@ -50,6 +51,7 @@ class Bossa : public Nan::ObjectWrap {
         static NAN_METHOD(Info);
         static NAN_METHOD(Read);
         static NAN_METHOD(Erase);
+        static NAN_METHOD(Verify);
         static NAN_METHOD(Write);
 
         static Nan::Persistent<v8::FunctionTemplate> constructor;

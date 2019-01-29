@@ -1,19 +1,21 @@
-#include "writeworker.h"
+#include "verifyworker.h"
 #include "util.h"
 
 using namespace v8;
 
 
-void WriteWorker::Execute() {
+void VerifyWorker::Execute() {
     try {
-        bossa->write(content, offset);
+        if (!bossa->verify(content, offset)) {
+            throw std::runtime_error("Failed");
+        }
     } catch(const std::exception& exc) {
         SetErrorMessage(exc.what());
     }
 }
 
 
-void WriteWorker::HandleOKCallback() {
+void VerifyWorker::HandleOKCallback() {
     Nan::HandleScope scope;
 
     Local<Value> argv[] = {
@@ -24,7 +26,7 @@ void WriteWorker::HandleOKCallback() {
 }
 
 
-void WriteWorker::HandleErrorCallback() {
+void VerifyWorker::HandleErrorCallback() {
     Nan::HandleScope scope;
 
     Local<Value> argv[] = {
