@@ -93,7 +93,7 @@ Bossa::read(uint32_t offset, uint32_t size) {
 
 
 bool
-Bossa::verify(std::string content, uint32_t offset) {
+Bossa::verify(Nan::TypedArrayContents<uint8_t>& buffer, uint32_t offset) {
     // FIXME: deprecated
     const char* filename = std::tmpnam(nullptr);
 
@@ -101,7 +101,7 @@ Bossa::verify(std::string content, uint32_t offset) {
     std::ofstream file(filename, std::ios::binary);
 
     try {
-        file.write(content.c_str(), content.length());
+        file.write(reinterpret_cast<char*>(*buffer), buffer.length());
         file.close();
     } catch (...) {
         file.close();
@@ -129,7 +129,7 @@ Bossa::verify(std::string content, uint32_t offset) {
 
 
 void
-Bossa::write(std::string content, uint32_t offset) {
+Bossa::write(Nan::TypedArrayContents<uint8_t>& buffer, uint32_t offset) {
     // FIXME: deprecated
     const char* filename = std::tmpnam(nullptr);
 
@@ -137,7 +137,7 @@ Bossa::write(std::string content, uint32_t offset) {
     std::ofstream file(filename, std::ios::binary);
 
     try {
-        file.write(content.c_str(), content.length());
+        file.write(reinterpret_cast<char*>(*buffer), buffer.length());
         file.close();
     } catch (...) {
         file.close();
@@ -311,11 +311,10 @@ NAN_METHOD(Bossa::Verify) {
         return Nan::ThrowTypeError("must provide buffer, offset and callback");
     }
 
-    if (!info[0]->IsObject()) {
+    if (!info[0]->IsUint8Array()) {
         return Nan::ThrowTypeError("data must be a Buffer");
     }
-    // This memory is owned by the buffer
-    const char* buffer = node::Buffer::Data(Nan::To<Object>(info[0]).ToLocalChecked());
+    Local buffer = Nan::To<Object>(info[0]).ToLocalChecked();
     
     if (!info[1]->IsUint32()) {
         return Nan::ThrowTypeError("offset must be an integer");
@@ -339,11 +338,10 @@ NAN_METHOD(Bossa::Write) {
         return Nan::ThrowTypeError("must provide buffer, offset and callback");
     }
 
-    if (!info[0]->IsObject()) {
+    if (!info[0]->IsUint8Array()) {
         return Nan::ThrowTypeError("data must be a Buffer");
     }
-    // This memory is owned by the buffer
-    const char* buffer = node::Buffer::Data(Nan::To<Object>(info[0]).ToLocalChecked());
+    Local buffer = Nan::To<Object>(info[0]).ToLocalChecked();
     
     if (!info[1]->IsUint32()) {
         return Nan::ThrowTypeError("offset must be an integer");

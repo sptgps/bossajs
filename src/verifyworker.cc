@@ -6,7 +6,7 @@ using namespace v8;
 
 void VerifyWorker::Execute() {
     try {
-        if (!bossa->verify(content, offset)) {
+        if (!bossa->verify(buffer, offset)) {
             throw std::runtime_error("Failed");
         }
     } catch(const std::exception& exc) {

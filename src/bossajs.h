@@ -40,8 +40,8 @@ class Bossa : public Nan::ObjectWrap {
         void info(FlasherInfo& info);
         std::string read(uint32_t offset, uint32_t size);
         void erase(uint32_t offset);
-        bool verify(std::string content, u_int32_t offset);
-        void write(std::string content, uint32_t offset);
+        bool verify(Nan::TypedArrayContents<uint8_t>& buffer, u_int32_t offset);
+        void write(Nan::TypedArrayContents<uint8_t>& buffer, uint32_t offset);
 
         static NAN_MODULE_INIT(Init);
 

@@ -11,17 +11,17 @@ class WriteWorker : public Nan::AsyncWorker {
     private:
         Bossa* bossa;
 
-        std::string content;
+        Nan::TypedArrayContents<uint8_t> buffer;
         uint32_t offset;
 
     public:
         WriteWorker(Nan::Callback* callback,
                     Bossa* bossa,
-                    std::string content,
+                    Local<Object> buffer,
                     uint32_t offset)
                   : Nan::AsyncWorker(callback),
                     bossa(bossa),
-                    content(content),
+                    buffer(buffer),
                     offset(offset)
                     {}
         ~WriteWorker() {}

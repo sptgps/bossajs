@@ -6,7 +6,7 @@ using namespace v8;
 
 void WriteWorker::Execute() {
     try {
-        bossa->write(content, offset);
+        bossa->write(buffer, offset);
     } catch(const std::exception& exc) {
         SetErrorMessage(exc.what());
     }
