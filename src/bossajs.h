@@ -37,8 +37,9 @@ class Bossa : public Nan::ObjectWrap {
 
         // C++ Methods
         void connect(std::string port);
+        void close();
         void info(FlasherInfo& info);
-        std::string read(uint32_t offset, uint32_t size);
+        std::vector<char> read(uint32_t offset, uint32_t size);
         void erase(uint32_t offset);
         bool verify(Nan::TypedArrayContents<uint8_t>& buffer, u_int32_t offset);
         void write(Nan::TypedArrayContents<uint8_t>& buffer, uint32_t offset);
@@ -48,6 +49,7 @@ class Bossa : public Nan::ObjectWrap {
         // Node methods
         static NAN_METHOD(New);
         static NAN_METHOD(Connect);
+        static NAN_METHOD(Close);
         static NAN_METHOD(Info);
         static NAN_METHOD(Read);
         static NAN_METHOD(Erase);

@@ -56,7 +56,7 @@ Bossa::info(FlasherInfo& finfo) {
 }
 
 
-std::string  // FIXME: potentially very big
+std::vector<char>  // FIXME: potentially very big
 Bossa::read(uint32_t offset, uint32_t size) {
     // FIXME: deprecated
     const char* filename = std::tmpnam(nullptr);
@@ -74,8 +74,8 @@ Bossa::read(uint32_t offset, uint32_t size) {
     std::ifstream file(filename, std::ios::binary);
 
     try {
-        std::string content((std::istreambuf_iterator<char>(file)),
-                            std::istreambuf_iterator<char>());
+        std::vector<char> content((std::istreambuf_iterator<char>(file)),
+                                   std::istreambuf_iterator<char>());
 
         file.close();
         std::remove(filename);

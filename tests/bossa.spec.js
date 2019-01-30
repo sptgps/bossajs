@@ -96,7 +96,7 @@ describe("Bossa", () => {
 
     it("write and read", async () => {
         const bossa = new Bossa();
-        const buffer = Buffer.from([0xd, 0xe, 0xa, 0xd, 0xb, 0xe, 0xe, 0xf]);
+        const buffer = Buffer.from([0xd, 0xe, 0xa, 0xd, 0x0, 0xb, 0xe, 0xe, 0xf]);
 
         await toPromise(bossa, 'connect', process.env.PORT);
         await toPromise(bossa, 'write', buffer, 0x3000);

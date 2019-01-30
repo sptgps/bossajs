@@ -16,7 +16,7 @@ void ReadWorker::Execute() {
 void ReadWorker::HandleOKCallback() {
     Nan::HandleScope scope;
 
-    Local<Value> buffer = Nan::CopyBuffer(result.c_str(), result.length())
+    Local<Value> buffer = Nan::CopyBuffer(result.data(), result.size())
         .ToLocalChecked();
 
     Local<Value> argv[] = {

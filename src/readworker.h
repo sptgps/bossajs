@@ -14,7 +14,7 @@ class ReadWorker : public Nan::AsyncWorker {
         uint32_t offset;
         uint32_t size;
 
-        std::string result;
+        std::vector<char> result;
 
     public:
         ReadWorker(Nan::Callback* callback,
