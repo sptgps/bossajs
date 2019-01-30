@@ -4,6 +4,7 @@
 
 #include "bossajs.h"
 #include "connectworker.h"
+#include "closeworker.h"
 #include "eraseworker.h"
 #include "infoworker.h"
 #include "readworker.h"
@@ -37,6 +38,12 @@ Bossa::connect(std::string port) {
     flasher.emplace(samba, *device, observer);
 
     connected = true;
+}
+
+
+void
+Bossa::close() {
+    samba.disconnect();
 }
 
 
@@ -169,6 +176,7 @@ NAN_MODULE_INIT(Bossa::Init) {
 
     // Set Methods into Prototype
     Nan::SetPrototypeMethod(ctor, "connect", Connect);
+    Nan::SetPrototypeMethod(ctor, "close", Close);
     Nan::SetPrototypeMethod(ctor, "erase", Erase);
     Nan::SetPrototypeMethod(ctor, "info", Info);
     Nan::SetPrototypeMethod(ctor, "read", Read);
@@ -238,6 +246,23 @@ NAN_METHOD(Bossa::Connect) {
         new Nan::Callback(Nan::To<Function>(info[1]).ToLocalChecked());
 
     Nan::AsyncQueueWorker(new ConnectWorker(callback, self, port));
+}
+
+
+NAN_METHOD(Bossa::Close) {
+    Bossa *self = Nan::ObjectWrap::Unwrap<Bossa>(info.This());
+
+    if (info.Length() != 1) {
+        return Nan::ThrowTypeError("Must provide callback");
+    }
+
+    if (!info[0]->IsFunction()) {
+        return Nan::ThrowTypeError("callback must be a function");
+    }
+    Nan::Callback* callback =
+        new Nan::Callback(Nan::To<Function>(info[0]).ToLocalChecked());
+
+    Nan::AsyncQueueWorker(new CloseWorker(callback, self));
 }
 
 

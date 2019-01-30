@@ -99,10 +99,15 @@ describe("Bossa", () => {
         const buffer = Buffer.from([0xd, 0xe, 0xa, 0xd, 0x0, 0xb, 0xe, 0xe, 0xf]);
 
         await toPromise(bossa, 'connect', process.env.PORT);
-        await toPromise(bossa, 'write', buffer, 0x3000);
 
-        const result = await toPromise(bossa, 'read', 0x3000, buffer.length);
-        expect(result).to.deep.equal(buffer);
+        try {
+            await toPromise(bossa, 'write', buffer, 0x3000);
+            
+            const result = await toPromise(bossa, 'read', 0x3000, buffer.length);
+            expect(result).to.deep.equal(buffer);
+        } finally {
+            await toPromise(bossa, 'close');
+        }
     });
 
     describe("write and verify", () => {
@@ -111,8 +116,13 @@ describe("Bossa", () => {
             const buffer = Buffer.from([0xd, 0xe, 0xa, 0xd, 0xb, 0xe, 0xe, 0xf]);
     
             await toPromise(bossa, 'connect', process.env.PORT);
-            await toPromise(bossa, 'write', buffer, 0x3000);
-            await toPromise(bossa, 'verify', buffer, 0x3000);
+
+            try {
+                await toPromise(bossa, 'write', buffer, 0x3000);
+                await toPromise(bossa, 'verify', buffer, 0x3000);
+            } finally {
+                await toPromise(bossa, 'close');
+            }
         });
 
         it("bad", async () => {
@@ -121,16 +131,21 @@ describe("Bossa", () => {
 
             await toPromise(bossa, 'connect', process.env.PORT);
 
-            buffer = Buffer.from([0xd, 0xe, 0xa, 0xd, 0xb, 0xe, 0xe, 0xf]);
-            await toPromise(bossa, 'write', buffer, 0x3000);
-
-            buffer = Buffer.from([0xd, 0xe, 0xa, 0xd, 0xb, 0xe, 0xe, 0xd]);
-
             try {
-                await toPromise(bossa, 'verify', buffer, 0x3000);
-                assert.fail("Not reached");
-            } catch (e) {
-                expect(e).is.a('Error');
+                buffer = Buffer.from([0xd, 0xe, 0xa, 0xd, 0xb, 0xe, 0xe, 0xf]);
+                await toPromise(bossa, 'write', buffer, 0x3000);
+                
+                buffer = Buffer.from([0xd, 0xe, 0xa, 0xd, 0xb, 0xe, 0xe, 0xd]);
+                
+                try {
+                    await toPromise(bossa, 'verify', buffer, 0x3000);
+                    assert.fail("Not reached");
+                } catch (e) {
+                    expect(e).is.a('Error');
+                }
+
+            } finally {
+                await toPromise(bossa, 'close');
             }
         });
     });

@@ -16,6 +16,7 @@
       "src/bossajs.cc",
       "src/observer.cc",
       "src/connectworker.cc",
+      "src/closeworker.cc",
       "src/eraseworker.cc",
       "src/infoworker.cc",
       "src/readworker.cc",
