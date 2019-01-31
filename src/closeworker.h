@@ -13,10 +13,10 @@ class CloseWorker : public Nan::AsyncWorker {
 
     public:
         CloseWorker(Nan::Callback* callback,
-                      Bossa* bossa)
-                    : Nan::AsyncWorker(callback),
-                      bossa(bossa)
-                      {}
+                    Bossa* bossa)
+                  : Nan::AsyncWorker(callback),
+                    bossa(bossa)
+                    {}
         ~CloseWorker() {}
 
         void Execute();

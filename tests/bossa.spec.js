@@ -147,8 +147,23 @@ describe("Bossa", () => {
         const bossa = new Bossa();
         const events = [];
 
-        bossa.on('progress', event => events.push(event));
+        bossa.on('progress', (...args) => {
+            events.push([...args]);
+        });
 
         await bossa.connect(process.env.PORT);
+        await bossa.read(0x0, 512);
+
+        expect(events).to.deep.equal([
+            [0, 8],
+            [1, 8],
+            [2, 8],
+            [3, 8],
+            [4, 8],
+            [5, 8],
+            [6, 8],
+            [7, 8],
+            [8, 8],
+        ]);
     });
 });

@@ -213,8 +213,8 @@ NAN_METHOD(Bossa::New) {
     try {
         Bossa* self = new Bossa(debug);
 
-        self->Wrap(info.Holder());
-        info.GetReturnValue().Set(info.Holder());
+        self->Wrap(info.This());
+        info.GetReturnValue().Set(info.This());
     } catch(const std::exception& exc) {
         return Nan::ThrowError(exc.what());
     }
