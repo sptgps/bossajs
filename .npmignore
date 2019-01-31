@@ -1,0 +1,10 @@
+/.vscode/
+/build/
+
+/extern/bossa/install/
+/extern/bossa/res/
+/extern/bossa/.git/
+
+yarn-error.log
+tags
+*.tgz
