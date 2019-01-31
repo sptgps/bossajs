@@ -1,8 +1,9 @@
-const { assert, expect } = require('chai');
+import { assert, expect } from 'chai';
+
+import { Bossa } from '../';
 
 
 describe("Bossa", () => {
-    const Bossa = require('../').default;
 
     it("requires new", () => {
         expect(() => {

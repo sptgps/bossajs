@@ -25,4 +25,6 @@ class Bossa extends addon.Bossa {
     }
 }
 
-exports.default = Bossa;
+module.exports = {
+    Bossa,
+}
