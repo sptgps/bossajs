@@ -6,10 +6,8 @@
       "extern/bossa/src",
       "<!(node -e \"require('nan')\")"
     ],
-    "cflags_cc": [ "-std=c++17" ],
-    "cflags_cc!": [ "-fno-exceptions" ],
     "defines": [
-      "VERSION=FIXME"
+      "VERSION=bossajs"
     ],
     "sources": [
       "src/index.cc",
@@ -44,6 +42,32 @@
           "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
           "OTHER_CFLAGS": [ "-std=c++17" ]
         }
+      }],
+      ['OS=="win"', {
+        "sources": [
+          "extern/bossa/src/WinSerialPort.cpp",
+          "extern/bossa/src/WinPortFactory.cpp"
+        ],
+        "libraries": [
+          "-lsetupapi"
+        ],
+        # "msvs_configuration_platform": "win32",
+        "msvs_settings": {
+          "VCCLCompilerTool": {
+            "AdditionalOptions": [
+              "/EHsc",
+              "/std:c++17"
+            ]
+          }
+        }
+      }],
+      ['OS=="linux"', {
+        "sources": [
+          "PosixSerialPort.cpp",
+          "LinuxPortFactory.cpp"
+        ],
+        "cflags_cc": [ "-std=c++17" ],
+        "cflags_cc!": [ "-fno-exceptions" ]
       }]
     ]
   }]

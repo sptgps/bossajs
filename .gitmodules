@@ -1,3 +1,3 @@
 [submodule "extern/bossa"]
 	path = extern/bossa
-	url = https://github.com/shumatech/BOSSA/
+	url = https://github.com/sptgps/BOSSA/
