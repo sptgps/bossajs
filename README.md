@@ -18,6 +18,25 @@ git submodule update --init
 yarn rebuild
 ```
 
+### Windows
+
+Only `win32` is supported.
+
+As a superuser install Python and MSVS build tools:
+
+```
+npm install --global --production windows-build-tools
+```
+
+Then build the app as:
+
+```
+npm config set arch ia32 
+git submodule update --init
+node-gyp configure --arch x86
+node-gyp rebuild
+```
+
 ## Usage
 
 ```js
